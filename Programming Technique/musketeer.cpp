@@ -28,8 +28,14 @@ typedef struct musketeer_t
 }musketeer;
 
 void printMusketeerStatus( musketeer_t theMusketeer);
-musketeer_t  getDiamond( musketeer_t theMusketeer, int nPassedEvent);
 
+musketeer_t  getDiamond( musketeer_t theMusketeer, int nPassedEvent);
+musketeer_t  comeInn( musketeer_t theMusketeer, int nPassedEvent);
+musketeer_t  meetMilady( musketeer_t theMusketeer, int nPassedEvent);
+musketeer_t  fightAgainstArmy( musketeer_t theMusketeer, int nPassedEvent);
+musketeer_t  gambleWithNina( musketeer_t theMusketeer, int nPassedEvent);
+musketeer_t  faceToWhiteShark( musketeer_t theMusketeer, int nPassedEvent);
+musketeer_t  faceToTitan( musketeer_t theMusketeer, int nPassedEvent);
 
 
 
@@ -139,7 +145,8 @@ int calculate(char fname[])
 		
 			// Gather Diamond
 			if (theEvent == 0){ 
-				theMusketeer.nDiamond++;
+				theMusketeer.nDiamond++; // main rule
+				
 				cout << i+1<<". "<< theEvent <<" getDiamond" <<endl;
 				printMusketeerStatus(theMusketeer);
 				theMusketeer = getDiamond(theMusketeer, nPassedEvent);
@@ -147,22 +154,40 @@ int calculate(char fname[])
 			}
 
 			else if (theEvent == 1){
-				 cout << i+1<<". "<< theEvent <<" comeInn" <<endl;
+				cout << i+1<<". "<< theEvent <<" comeInn" <<endl;
+				printMusketeerStatus(theMusketeer);
+				theMusketeer = getDiamond(theMusketeer, nPassedEvent);
+				printMusketeerStatus(theMusketeer);
 			}
 			else if (theEvent == 666){
 				 cout << i+1<<". "<< theEvent <<" meetMilady" <<endl;
+				printMusketeerStatus(theMusketeer);
+				theMusketeer = getDiamond(theMusketeer, nPassedEvent);
+				printMusketeerStatus(theMusketeer);
 			}
 			else if((100 <= theEvent) && (theEvent < 200)){
 				 cout << i+1<<". "<< theEvent <<" fightAgainstArmy" <<endl;
+				printMusketeerStatus(theMusketeer);
+				theMusketeer = getDiamond(theMusketeer, nPassedEvent);
+				printMusketeerStatus(theMusketeer);				 
 			}
 			else if((200 <= theEvent) && (theEvent < 300)){
 				 cout << i+1<<". "<< theEvent <<" gambleWithNina" <<endl;
+				printMusketeerStatus(theMusketeer);
+				theMusketeer = getDiamond(theMusketeer, nPassedEvent);
+				printMusketeerStatus(theMusketeer);				 
 			}
 			else if((300 <= theEvent) && (theEvent  < 400)){
 				 cout << i+1<<". "<< theEvent <<" faceToWhiteShark" <<endl;
+				printMusketeerStatus(theMusketeer);
+				theMusketeer = getDiamond(theMusketeer, nPassedEvent);
+				printMusketeerStatus(theMusketeer);				 
 			}
 			else if((500 <= theEvent) && (theEvent < 600)){
 				 cout << i+1<<". "<< theEvent <<" faceToTitan" <<endl;
+				printMusketeerStatus(theMusketeer);
+				theMusketeer = getDiamond(theMusketeer, nPassedEvent);
+				printMusketeerStatus(theMusketeer);				 
 			}
 			else{
 				 cout << i+1<<". "<< theEvent <<" Invalid code" <<endl;
@@ -225,9 +250,79 @@ musketeer_t  getDiamond(musketeer_t theMusketeer, int nPassedEvent){
 	return theMusketeer;
 }
 
+
+
+musketeer_t  comeInn( musketeer_t theMusketeer, int nPassedEvent){
+	theMusketeer.nHealthPoint = 2; 
+	return theMusketeer;
+}	
+
+
+musketeer_t  meetMilady( musketeer_t theMusketeer, int nPassedEvent){
+	theMusketeer.nHealthPoint = 3; 
+	return theMusketeer;
+}
+
+
+musketeer_t  fightAgainstArmy( musketeer_t theMusketeer, int nPassedEvent){
+	theMusketeer.nHealthPoint = 3; 
+	return theMusketeer;
+}	
+
+
+musketeer_t  gambleWithNina( musketeer_t theMusketeer, int nPassedEvent){
+	theMusketeer.nHealthPoint = 4; 
+	return theMusketeer;
+}	
+
+
+musketeer_t  faceToWhiteShark( musketeer_t theMusketeer, int nPassedEvent){
+	theMusketeer.nHealthPoint = 5; 
+	return theMusketeer;
+}	
+
+
+musketeer_t  faceToTitan( musketeer_t theMusketeer, int nPassedEvent){
+	theMusketeer.nHealthPoint = 6; 
+	return theMusketeer;
+}	
+
+
+
+
 void printMusketeerStatus(musketeer_t theMusketeer){
+	/* print all attribute */
 	cout << "ID : " << theMusketeer.ID <<  endl;
-	cout << "nHP : " << theMusketeer.nHealthPoint <<endl;
+	cout << "nHealthPoint : " << theMusketeer.nHealthPoint <<endl;
+	cout << "nGoldCoin : " << theMusketeer.nGoldCoin <<  endl;
+	cout << "nDiamond : " << theMusketeer.nDiamond <<endl;
+	cout << "mythril : " << theMusketeer.mythril <<  endl;
+	cout << "winGamble3Time : " << theMusketeer.winGamble3Time <<endl;
+	cout << ": ------------------------ :" <<endl;
 	return;
 }
+
+
+
+/* 
+ * 
+ *  object stack  + obj_heap(create by "new", e.g: new obj1 ) ???
+ * /object trong stack -> het tam vuc -> huy
+ * 
+ * khoi tao new
+ * huy delete
+ * shalow copy =  p2 = p1, p3(p1)
+ * khoi tao + sao chep : copy contructors
+
+*** if have pointer + user p2(p1) => p2.pt = p1.pt ( delete p1 => p2.pt = dummy) 
+* 	=> not copy full ( only memory add) => SHALOW
+ 
+ Q: ???
+ * p = class;
+ * p = class();
+ * 
+ STATIC 
+ 
+ class::static_method();
+*/
 
