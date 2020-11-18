@@ -23,7 +23,15 @@ typedef struct musketeer_t
 	int nHealthPoint; // the current heath point
 	int nGoldCoin; // the current number of gold coins
 	int nDiamond; // the current number of diamonds
+	int mythril; // win Greate White Shark then awarded
+	int winGamble3Time; // win gamble over Nina Merchant 3 time => free to stay Inn
 }musketeer;
+
+void printMusketeerStatus( musketeer_t theMusketeer);
+musketeer_t  getDiamond( musketeer_t theMusketeer, int nPassedEvent);
+
+
+
 
 using namespace std;
 
@@ -125,40 +133,50 @@ int calculate(char fname[])
 
 	while (1) {
 		for (i = 0; i < nEvent; i++) {
+			cout << "************************** " << " Event no=" << nPassedEvent+1 <<endl;
 			theEvent = arrEvent[i];
-			cout <<"the Event-"<<i+0<<" " << theEvent << '\n';
 			/* use First i = 1 not 0 */
 		
-			if (theEvent == 0) // Gather Diamond
+			// Gather Diamond
+			if (theEvent == 0){ 
 				theMusketeer.nDiamond++;
+				cout << i+1<<". "<< theEvent <<" getDiamond" <<endl;
+				printMusketeerStatus(theMusketeer);
+				theMusketeer = getDiamond(theMusketeer, nPassedEvent);
+				printMusketeerStatus(theMusketeer);
+			}
+
 			else if (theEvent == 1){
-				 cout << theEvent <<" ComeToInn" <<endl;
+				 cout << i+1<<". "<< theEvent <<" comeInn" <<endl;
 			}
 			else if (theEvent == 666){
-				 cout << theEvent <<" meetMilady" <<endl;
+				 cout << i+1<<". "<< theEvent <<" meetMilady" <<endl;
 			}
-			else if ( 100 <= theEvent < 200) {
-				 cout << theEvent <<" fightAgainstArmy" <<endl;
+			else if((100 <= theEvent) && (theEvent < 200)){
+				 cout << i+1<<". "<< theEvent <<" fightAgainstArmy" <<endl;
 			}
-			else if ( 200 <= theEvent < 300) {
-				 cout << theEvent <<" gambleWithNina" <<endl;
+			else if((200 <= theEvent) && (theEvent < 300)){
+				 cout << i+1<<". "<< theEvent <<" gambleWithNina" <<endl;
 			}
-			else if ( 300 <= theEvent < 400) {
-				 cout << theEvent <<" faceToWhiteShark" <<endl;
+			else if((300 <= theEvent) && (theEvent  < 400)){
+				 cout << i+1<<". "<< theEvent <<" faceToWhiteShark" <<endl;
 			}
-			else if ( 500 <= theEvent < 600) {
-				 cout << theEvent <<" faceToTitan" <<endl;
+			else if((500 <= theEvent) && (theEvent < 600)){
+				 cout << i+1<<". "<< theEvent <<" faceToTitan" <<endl;
 			}
 			else{
-				 cout << theEvent <<"Error code" <<endl;
+				 cout << i+1<<". "<< theEvent <<" Invalid code" <<endl;
 				 return -111;
 			}
 				
 						
+			
 			///////////////////////
 			// TO DO - Other Cases //
 			///////////////////////
 			nPassedEvent++;
+			
+			
 			if (theMusketeer.nDiamond >= N || theMusketeer.nHealthPoint <= 0 || i >= nEvent)
 				break;
 		}
@@ -169,6 +187,7 @@ int calculate(char fname[])
 
 	switch (M) {
 		case 0: // Mode 0
+			cout << endl <<endl <<"--- Total diamons = " ;// NO more code here!!!;
 			if (theMusketeer.nDiamond >= N)
 				nOut = theMusketeer.nHealthPoint + theMusketeer.nGoldCoin;
 			else if (theMusketeer.nHealthPoint <= 0)
@@ -176,6 +195,7 @@ int calculate(char fname[])
 			else if (i >= nEvent)
 				nOut = 0;
 			break;
+			
 		////////////////////////
 		// TO DO - Other Modes //
 		////////////////////////
@@ -186,6 +206,8 @@ int calculate(char fname[])
 
 	return nOut;
 }
+
+
 int main()
 {
 
@@ -195,3 +217,17 @@ int main()
 
     return 1;
 }
+
+
+
+musketeer_t  getDiamond(musketeer_t theMusketeer, int nPassedEvent){
+	theMusketeer.nHealthPoint = 555; 
+	return theMusketeer;
+}
+
+void printMusketeerStatus(musketeer_t theMusketeer){
+	cout << "ID : " << theMusketeer.ID <<  endl;
+	cout << "nHP : " << theMusketeer.nHealthPoint <<endl;
+	return;
+}
+
