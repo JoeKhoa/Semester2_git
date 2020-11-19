@@ -8,6 +8,8 @@
 #include <math.h>
 #include <iostream>
 
+
+
 const int EVENT_SIZE = 1001;
 const int MAX_CHARACTER_EACH_LINE = 5001;
 
@@ -23,20 +25,22 @@ typedef struct musketeer_t
 	int nHealthPoint; // the current heath point
 	int nGoldCoin; // the current number of gold coins
 	int nDiamond; // the current number of diamonds
-	int mythril; // win Greate White Shark then awarded
-	int winGamble3Time; // win gamble over Nina Merchant 3 time => free to stay Inn
+	int mythril=0; // win Greate White Shark then awarded
+	int winGamble3Time=0; // win gamble over Nina Merchant 3 time => free to stay Inn
 }musketeer;
 
 void printMusketeerStatus( musketeer_t theMusketeer);
-int  fightRule( int eventIndex, int eventCode, int athos = 0)_;
+int fightRule( musketeer_t theMusketeer, int theEvent, int eventIndex);
+int fightArmyRuleOnlyForAthos( musketeer_t theMusketeer, int theEvent, int eventIndex);
+int soNguyenTo(int soA);
 
-musketeer_t  getDiamond( musketeer_t theMusketeer, int theEvent, int nPassedEvent);
-musketeer_t  comeInn( musketeer_t theMusketeer, int theEvent, int nPassedEvent);
-musketeer_t  meetMilady( musketeer_t theMusketeer, int theEvent, int nPassedEvent);
-musketeer_t  fightAgainstArmy( musketeer_t theMusketeer, int theEvent, int nPassedEvent);
-musketeer_t  gambleWithNina( musketeer_t theMusketeer, int theEvent, int nPassedEvent);
-musketeer_t  faceToWhiteShark( musketeer_t theMusketeer, int theEvent, int nPassedEvent);
-musketeer_t  faceToTitan( musketeer_t theMusketeer, int theEvent, int nPassedEvent);
+musketeer_t  getDiamond( musketeer_t theMusketeer, int theEvent, int eventIndex);
+musketeer_t  comeInn( musketeer_t theMusketeer, int theEvent, int eventIndex);
+musketeer_t  meetMilady( musketeer_t theMusketeer, int theEvent, int eventIndex);
+musketeer_t  fightAgainstArmy( musketeer_t theMusketeer, int theEvent, int eventIndex);
+musketeer_t  gambleWithNina( musketeer_t theMusketeer, int theEvent, int eventIndex);
+musketeer_t  faceToWhiteShark( musketeer_t theMusketeer, int theEvent, int eventIndex);
+musketeer_t  faceToTitan( musketeer_t theMusketeer, int theEvent, int eventIndex);
 
 
 
@@ -55,7 +59,7 @@ int readFile(musketeer* theMusketeer, int* M, int* N, int* nEvent, int arrEvent[
 	FILE* f = 0;
 
 	char* str = (char*)malloc(MAX_CHARACTER_EACH_LINE);
-	int start, len, num;
+	//~ int start, len, num;
 
 	f = fopen(filename, "r");
 	if (f == NULL)
@@ -143,51 +147,51 @@ int calculate(char fname[])
 			cout << "************************** " << " Event no=" << nPassedEvent+1 <<endl;
 			theEvent = arrEvent[i];
 			/* use First i = 1 not 0 */
-			int eventIndex = nPassedEvent + 1;
-				
+			int eventIndex;
+			eventIndex = nPassedEvent + 1;
 			// Gather Diamond
 			if (theEvent == 0){ 
 				theMusketeer.nDiamond++; // main rule
 				cout << i+1<<". "<< theEvent <<" getDiamond" <<endl;
 				printMusketeerStatus(theMusketeer);
-				theMusketeer = getDiamond(theMusketeer, theEvent, nPassedEvent);
+				theMusketeer = getDiamond(theMusketeer, theEvent, eventIndex);
 				printMusketeerStatus(theMusketeer);
 			}
 
 			else if (theEvent == 1){
 				cout << i+1<<". "<< theEvent <<" comeInn" <<endl;
 				printMusketeerStatus(theMusketeer);
-				theMusketeer = getDiamond(theMusketeer, theEvent, nPassedEvent);
+				theMusketeer = getDiamond(theMusketeer, theEvent, eventIndex);
 				printMusketeerStatus(theMusketeer);
 			}
 			else if (theEvent == 666){
 				cout << i+1<<". "<< theEvent <<" meetMilady" <<endl;
 				printMusketeerStatus(theMusketeer);
-				theMusketeer = getDiamond(theMusketeer, theEvent, nPassedEvent);
+				theMusketeer = getDiamond(theMusketeer, theEvent, eventIndex);
 				printMusketeerStatus(theMusketeer);
 			}
 			else if((100 <= theEvent) && (theEvent < 200)){
 				cout << i+1<<". "<< theEvent <<" fightAgainstArmy" <<endl;
 				printMusketeerStatus(theMusketeer);
-				theMusketeer = getDiamond(theMusketeer, theEvent, nPassedEvent);
+				theMusketeer = getDiamond(theMusketeer, theEvent, eventIndex);
 				printMusketeerStatus(theMusketeer);				 
 			}
 			else if((200 <= theEvent) && (theEvent < 300)){
 				 cout << i+1<<". "<< theEvent <<" gambleWithNina" <<endl;
 				printMusketeerStatus(theMusketeer);
-				theMusketeer = getDiamond(theMusketeer, theEvent, nPassedEvent);
+				theMusketeer = getDiamond(theMusketeer, theEvent, eventIndex);
 				printMusketeerStatus(theMusketeer);				 
 			}
 			else if((300 <= theEvent) && (theEvent  < 400)){
 				 cout << i+1<<". "<< theEvent <<" faceToWhiteShark" <<endl;
 				printMusketeerStatus(theMusketeer);
-				theMusketeer = getDiamond(theMusketeer, theEvent, nPassedEvent);
+				theMusketeer = getDiamond(theMusketeer, theEvent, eventIndex);
 				printMusketeerStatus(theMusketeer);				 
 			}
 			else if((500 <= theEvent) && (theEvent < 600)){
 				 cout << i+1<<". "<< theEvent <<" faceToTitan" <<endl;
 				printMusketeerStatus(theMusketeer);
-				theMusketeer = getDiamond(theMusketeer, theEvent, nPassedEvent);
+				theMusketeer = getDiamond(theMusketeer, theEvent, eventIndex);
 				printMusketeerStatus(theMusketeer);				 
 			}
 			else{
@@ -213,9 +217,10 @@ int calculate(char fname[])
 
 	switch (M) {
 		case 0: // Mode 0
-			cout << endl <<endl <<"--- Total diamons = " ;// NO more code here!!!;
-			if (theMusketeer.nDiamond >= N)
+			if (theMusketeer.nDiamond >= N){
+				cout << endl <<endl <<"--- Total R = nHealthPoint + nGoldCoin  = " ;// NO more code here!!!;
 				nOut = theMusketeer.nHealthPoint + theMusketeer.nGoldCoin;
+			}
 			else if (theMusketeer.nHealthPoint <= 0)
 				nOut = -1;
 			else if (i >= nEvent)
@@ -247,27 +252,68 @@ int main()
 
 
 musketeer_t  getDiamond(musketeer_t theMusketeer, int theEvent, int nPassedEvent){
-	theMusketeer.nHealthPoint = 555; 
+	theMusketeer.nDiamond +=1;
 	return theMusketeer;
 }
 
 
 
 musketeer_t  comeInn( musketeer_t theMusketeer, int theEvent, int nPassedEvent){
-	theMusketeer.nHealthPoint = 2; 
+	if(theMusketeer.winGamble3Time >=3){
+		theMusketeer.nHealthPoint = theMusketeer.HP;
+		return theMusketeer;
+	}
+	int coin = theMusketeer.nGoldCoin;
+	if (coin > 0){
+		if (theMusketeer.ID != PORTHOS)
+			theMusketeer.nHealthPoint += coin;
+		else
+			theMusketeer.nHealthPoint += coin/2;
+	}
+	if(theMusketeer.nHealthPoint >theMusketeer.HP){
+		theMusketeer.nHealthPoint = theMusketeer.HP;
+	}
+	 
 	return theMusketeer;
 }	
 
 
-musketeer_t  meetMilady( musketeer_t theMusketeer, int theEvent, int nPassedEvent){
-	theMusketeer.nHealthPoint = 3; 
+musketeer_t  meetMilady( musketeer_t theMusketeer, int theEvent, int eventIndex){
+	switch (theMusketeer.ID) {
+		case DARTAGNAN: // win
+				theMusketeer.nHealthPoint = 0;
+			break;
+		case ATHOS: // Lose
+				theMusketeer.nGoldCoin = 999;
+			break;
+		case ARAMIS: // tie (1-1)
+			for(int i = theMusketeer.nHealthPoint; i>0; i--){
+				if(soNguyenTo(i)){
+					cout <<"so nguyen to: "<< i << endl;
+					theMusketeer.nHealthPoint = i;
+				}
+				else{
+					cout <<"khong nguyen to: " << i << endl;
+				}
+
+			}
+			break;
+		default:
+				break;	
+	}
+
+
 	return theMusketeer;
 }
 
 
-musketeer_t  fightAgainstArmy( musketeer_t theMusketeer, int theEvent, int nPassedEvent){
+musketeer_t  fightAgainstArmy( musketeer_t theMusketeer, int theEvent, int eventIndex){
 	int fightWin = 0;
-	fightWin = fightRule(nPassedEvent, theEvent);
+	if (theMusketeer.ID == ATHOS)
+		fightWin= fightArmyRuleOnlyForAthos(theMusketeer, theEvent, eventIndex);
+	else
+		fightWin = fightRule(theMusketeer, theEvent, eventIndex);
+	
 	switch (fightWin) {
 		case 1: // win
 			if (theEvent < 999)
@@ -277,7 +323,10 @@ musketeer_t  fightAgainstArmy( musketeer_t theMusketeer, int theEvent, int nPass
 			
 			break;
 		case -1: // Lose
-			theMusketeer.nHealthPoint -=theEvent;
+			if(theMusketeer.mythril == 1)
+				theMusketeer.nHealthPoint -=theEvent/10;
+			else
+				theMusketeer.nHealthPoint -=theEvent;
 			break;
 		case 0: // tie (1-1)
 			cout << "tie game" << endl;
@@ -289,22 +338,79 @@ musketeer_t  fightAgainstArmy( musketeer_t theMusketeer, int theEvent, int nPass
 }	
 
 
-musketeer_t  gambleWithNina( musketeer_t theMusketeer, int theEvent, int nPassedEvent){
-	theMusketeer.nHealthPoint = 4; 
+musketeer_t  gambleWithNina( musketeer_t theMusketeer, int theEvent, int eventIndex){
+	int fightWin = 0;
+	fightWin = fightRule(theMusketeer, theEvent, eventIndex);
+	switch (fightWin) {
+		case 1: // win
+			theMusketeer.winGamble3Time +=1;
+			theMusketeer.nGoldCoin *=2;
+			if(theMusketeer.nGoldCoin > 999){
+				theMusketeer.nGoldCoin = 999;
+			}
+			break;
+		case -1: // Lose
+			theMusketeer.nGoldCoin /=2;
+			break;
+		case 0: // tie (1-1)
+			cout << "tie game" << endl;
+			break;
+		default:
+				break;	
+	}
 	return theMusketeer;
 }	
 
 
-musketeer_t  faceToWhiteShark( musketeer_t theMusketeer, int theEvent, int nPassedEvent){
-	theMusketeer.nHealthPoint = 5; 
+musketeer_t  faceToWhiteShark( musketeer_t theMusketeer, int theEvent, int eventIndex){
+	if(theMusketeer.mythril == 1){
+		return theMusketeer;
+	}
+	int fightWin = 0;
+	fightWin = fightRule(theMusketeer, theEvent, eventIndex);
+	switch (fightWin) {
+		case 1: // win
+		theMusketeer.mythril = 1;
+			break;
+		case -1: // Lose
+			theMusketeer.nDiamond = 0;
+			break;
+		case 0: // tie (1-1)
+			cout << "tie game" << endl;
+			break;
+		default:
+				break;	
+	}
 	return theMusketeer;
 }	
 
 
-musketeer_t  faceToTitan( musketeer_t theMusketeer, int theEvent, int nPassedEvent){
-	theMusketeer.nHealthPoint = 6; 
+musketeer_t  faceToTitan( musketeer_t theMusketeer, int theEvent, int eventIndex){
+	int fightWin = 0;
+	if (theMusketeer.ID == PORTHOS)
+		return theMusketeer;
+	else
+		fightWin = fightRule(theMusketeer, theEvent, eventIndex);
+	
+	switch (fightWin) {
+		case 1: // win
+			cout << "Titan have no gold" << endl;
+			break;
+		case -1: // Lose
+			if(theMusketeer.mythril == 1)
+				theMusketeer.nHealthPoint -=theEvent/10;
+			else
+				theMusketeer.nHealthPoint -=theEvent;
+			break;
+		case 0: // tie (1-1)
+			cout << "tie game" << endl;
+			break;
+		default:
+				break;	
+	}
 	return theMusketeer;
 }	
+
 
 
 
@@ -321,23 +427,45 @@ void printMusketeerStatus(musketeer_t theMusketeer){
 	return;
 }
 
-int  fightRule( int eventIndex, int eventCode, int athos = 0){
+int fightRule( musketeer_t theMusketeer, int theEvent, int eventIndex){
 	int h1, h2;
 	h1 = eventIndex%100;
-	h2 = eventCode%100;
+	h2 = theEvent%100;
+
+	if(h1 > h2) return 1;
+	else if(h1 < h2) return -1;		
+	else return 0;
+}
+
+
+int fightArmyRuleOnlyForAthos( musketeer_t theMusketeer, int theEvent, int eventIndex){
+	int h1, h2;
+	h1 = eventIndex%100;
+	h2 = theEvent%100;
 
 	if(h1 > h2) return 1;
 	else if(h1 < h2){
-		if(athos && h2<=5){
-			return 0;
-		}
-		else
-			return -1;		
+		if(h2<=5) return 0;
+		else return -1;		
 	}
 	else return 0;
 }
 
 
+int soNguyenTo(int soA)
+{
+    if (soA < 2)    
+        return 0;
+
+    for (int i = 2; i <= sqrt((float)soA); i ++)
+    {
+        if (soA%i==0)
+        {
+            return 0;
+        }
+    }
+    return 1;
+}
 
 
 /* 
